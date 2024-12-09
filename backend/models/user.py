@@ -1,6 +1,4 @@
-# e:\cuidar+\backend\models\user.py
-
-from db import db  # Importando o db do novo arquivo
+from db import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

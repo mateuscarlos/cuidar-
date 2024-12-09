@@ -1,15 +1,15 @@
-# e:\cuidar+\backend\routes\user_routes.py
-
 from flask import Blueprint, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from models.user import User
 from db import db  # Importando o db do novo arquivo
+from flasgger import swag_from
 
 user_routes = Blueprint('user_routes', __name__)
 
 usuarios = []
 
 @user_routes.route('/api/users', methods=['POST'])
+@swag_from('create_user.yml')
 def create_user():
     data = request.json
     new_user = User(
@@ -26,11 +26,12 @@ def create_user():
     return jsonify({'message': 'Usuário criado com sucesso!'}), 201
 
 @user_routes.route('/api/consultar_usuario', methods=['GET'])
+@swag_from('get_user.yml')
 def pesquisar_usuario():
     campo = request.args.get('campo')
     valor = request.args.get('valor')
 
-    if campo not in ['nome', 'cpf', 'setor', 'matricula', 'registro_categoria']:
+    if campo not in ['id', 'nome', 'cpf', 'setor', 'matricula', 'registro_categoria']:
         return jsonify({"message": "Campo de pesquisa inválido."}), 400
 
     # Realiza a consulta no banco de dados
@@ -57,6 +58,7 @@ def pesquisar_usuario():
     return jsonify(resultado)
 
 @user_routes.route('/api/atualizar_usuario', methods=['PUT'])
+@swag_from('update_user.yml')
 def atualizar_usuario():
     matricula = request.json['matricula']
     nome = request.json['nome']
@@ -81,6 +83,7 @@ def atualizar_usuario():
 
 
 @user_routes.route('/api/excluir_usuario', methods=['DELETE'])
+@swag_from('delete_user.yml')
 def excluir_usuario():
     matricula = request.args.get('matricula')
 

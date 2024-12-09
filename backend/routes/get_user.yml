@@ -1,0 +1,19 @@
+summary: Obtem um usuário existente
+description: Obtem um usuário existente com o ID fornecido
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - name: user_id
+    in: path
+    description: ID do usuário
+    required: true
+    type: integer
+responses:
+  200:
+    description: Usuário obtido com sucesso
+  400:
+    description: Requisição inválida
+  404:
+    description: Usuário não encontrado
