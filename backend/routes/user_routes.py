@@ -96,4 +96,7 @@ def excluir_usuario():
         return jsonify({'message': 'Usuário não encontrado!'}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        app.run(debug=True)
+    except Exception as e:
+        print("Erro inesperado: ", e)
