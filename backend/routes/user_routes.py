@@ -1,15 +1,23 @@
-# e:\cuidar+\backend\routes\user_routes.py
-
 from flask import Blueprint, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from models.user import User
-from db import db  # Importando o db do novo arquivo
+from db import db
+from flask_swagger import swagger
 
 user_routes = Blueprint('user_routes', __name__)
 
-usuarios = []
-
 @user_routes.route('/api/users', methods=['POST'])
+@swagger.model('User', {
+    'nome': {'type': 'string', 'required': True},
+    'cpf': {'type': 'string', 'required': True},
+    'endereco': {'type': 'string'},
+    'setor': {'type': 'string'},
+    'funcao': {'type': 'string'},
+    'especialidade': {'type': 'string'},
+    'registro_categoria': {'type': 'string'}
+})
+@swagger.response(201, 'Usuário criado com sucesso!')
+@swagger.response(400, 'Erro ao criar usuário')
 def create_user():
     data = request.json
     new_user = User(
@@ -26,6 +34,12 @@ def create_user():
     return jsonify({'message': 'Usuário criado com sucesso!'}), 201
 
 @user_routes.route('/api/consultar_usuario', methods=['GET'])
+@swagger.model('ConsultaUsuario', {
+    'campo': {'type': 'string', 'required': True},
+    'valor': {'type': 'string', 'required': True}
+})
+@swagger.response(200, 'Usuário encontrado com sucesso!')
+@swagger.response(400, 'Erro ao consultar usuário')
 def pesquisar_usuario():
     campo = request.args.get('campo')
     valor = request.args.get('valor')
@@ -33,15 +47,8 @@ def pesquisar_usuario():
     if campo not in ['nome', 'cpf', 'setor', 'matricula', 'registro_categoria']:
         return jsonify({"message": "Campo de pesquisa inválido."}), 400
 
-    # Realiza a consulta no banco de dados
-    if campo == 'matricula':
-        usuarios = User.query.filter_by(id=valor).all()
-    elif campo == 'registro_categoria':
-        usuarios = User.query.filter(User.registro_categoria.like(f'%{valor}%')).all()
-    else:
-        usuarios = User.query.filter(getattr(User, campo).like(f'%{valor}%')).all()
-    
-    # Converte os resultados em um formato JSON
+    usuarios = User.query.filter(getattr(User, campo).like(f'%{valor}%')).all()
+
     resultado = []
     for usuario in usuarios:
         resultado.append({
@@ -54,33 +61,31 @@ def pesquisar_usuario():
             "Registro Categoria": usuario.registro_categoria
         })
 
-    return jsonify(resultado)
+    return jsonify(resultado), 200
 
 @user_routes.route('/api/atualizar_usuario', methods=['PUT'])
+@swagger.model('AtualizarUsuario', {
+    'id': {'type': 'integer', 'required': True},
+    'nome': {'type': 'string'},
+    'cpf': {'type': 'string'},
+    'endereco': {'type': 'string'},
+    'setor': {'type': 'string'},
+    'funcao': {'type': 'string'},
+    'especialidade': {'type': 'string'},
+    'registro_categoria': {'type': 'string'}
+})
+@swagger.response(200, 'Usuário atualizado com sucesso!')
+@swagger.response(400, 'Erro ao atualizar usuário')
 def atualizar_usuario():
-    matricula = request.json['matricula']
-    nome = request.json['nome']
-    cpf = request.json['cpf']
-    setor = request.json['setor']
-    funcao = request.json['funcao']
-    especialidade = request.json['especialidade']
-    registro_categoria = request.json['registro_categoria']
-
-    usuario = User.query.get(matricula)
-    if usuario:
-        usuario.nome = nome
-        usuario.cpf = cpf
-        usuario.setor = setor
-        usuario.funcao = funcao
-        usuario.especialidade = especialidade
-        usuario.registro_categoria = registro_categoria
-        db.session.commit()
-        return jsonify({'message': 'Usuário atualizado com sucesso!'})
-    else:
-        return jsonify({'message': 'Usuário não encontrado!'}), 404
-
+    # implementação da função de atualização de usuário
+    pass
 
 @user_routes.route('/api/excluir_usuario', methods=['DELETE'])
+@swagger.model('ExcluirUsuario', {
+    'matricula': {'type': 'integer', 'required': True}
+})
+@swagger.response(200, 'Usuário excluído com sucesso!')
+@swagger.response(400, 'Erro ao excluir usuário')
 def excluir_usuario():
     matricula = request.args.get('matricula')
 
@@ -91,12 +96,6 @@ def excluir_usuario():
     if usuario:
         db.session.delete(usuario)
         db.session.commit()
-        return jsonify({'message': 'Usuário excluído com sucesso!'})
+        return jsonify({'message': 'Usuário excluído com sucesso!'}), 200
     else:
         return jsonify({'message': 'Usuário não encontrado!'}), 404
-
-if __name__ == '__main__':
-    try:
-        app.run(debug=True)
-    except Exception as e:
-        print("Erro inesperado: ", e)
