@@ -1,11 +1,8 @@
 Flask
 Flask-SQLAlchemy
-Flask-Migrate
 Flask-Cors
-Flask-Swagger
 Werkzeug
-marshmallow
-marshmallow-sqlalchemy
 python-dotenv
 Flask-RESTx
-flask-swagger-ui
+flask-openapi3
+pydantic

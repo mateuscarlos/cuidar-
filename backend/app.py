@@ -3,18 +3,14 @@ from flask_cors import CORS
 from db import db
 from routes.user_routes import user_routes
 from routes.routes_app import app_routes
-from flask_swagger import swagger
+
 
 app = Flask(__name__, template_folder='../frontend/templates', static_folder='../frontend/static')
 CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5000"}})
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SWAGGER'] = {
-    'title': 'Cuidar+ API',
-    'uiversion': 3,
-    'openapi': '3.0.2'
-}
+
 
 db.init_app(app)
 
