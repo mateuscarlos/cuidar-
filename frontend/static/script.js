@@ -1,5 +1,3 @@
-// frontend/static/script.js
-
 // Objeto que mapeia setores para suas respectivas funções
 const funcoesPorSetor = {
     Operacao: [
@@ -57,7 +55,7 @@ const funcoesPorSetor = {
       "Coordenador Financeiro",
     ],
   };
-
+/*
 // Função para carregar a lista de usuários
 async function carregarUsuarios() {
     try {
@@ -81,7 +79,7 @@ async function carregarUsuarios() {
         console.error('Erro ao carregar usuários:', error);
     }
 }
-
+*/
 // Função para cadastrar um novo usuário
 async function cadastrarUsuario(event) {
     event.preventDefault(); // Impede o envio padrão do formulário
@@ -123,7 +121,7 @@ async function cadastrarUsuario(event) {
         alert('Erro ao se conectar ao servidor. Verifique se a API está rodando.');
     }
 }
-// Função para configurar os eventos do formulário
+// Função para configurar os eventos do formulário de cadastro de usuarios
 function configurarEventos() {
     const userForm = document.getElementById('userForm');
     if (userForm) {
@@ -190,17 +188,6 @@ function configurarEventos() {
         });
     }
 }
-// Função principal para inicializar o script
-function init() {
-    configurarEventos();
-    carregarUsuarios(); // Carrega a lista de usuários ao iniciar
-}
-
-// Chama a função init quando o DOM estiver completamente carregado
-document.addEventListener('DOMContentLoaded', init);
-
-// Configurar o evento de pesquisa
-document.getElementById('searchForm').addEventListener('submit', pesquisarUsuarios);
 
 // Função para pesquisar usuários
 async function pesquisarUsuarios(event) {
@@ -316,3 +303,76 @@ async function excluirUsuario(matricula) {
       console.error(error);
     }
   }
+
+  async function mostrarUsuarios() {
+    try {
+      const response = await fetch('http://localhost:5000/api/usuarios');
+      const usuarios = await response.json();
+      console.log(usuarios); // Verifica se os dados estão sendo retornados corretamente
+      console.log(usuarios.length); // Verifica se existem usuários
+      const tabelaUsuarios = document.getElementById('tabela-usuarios');
+  
+      // Limpa a tabela antes de adicionar novos usuários
+      tabelaUsuarios.innerHTML = '';
+  
+      // Verifica se existem usuários
+      if (usuarios.length === 0) {
+        tabelaUsuarios.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum usuário encontrado.</td></tr>';
+        return;
+      }
+  
+      // Cria a tabela com os cabeçalhos
+      const cabecalho = `
+        <tr>
+          <th>Matrícula</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Setor</th>
+          <th>Função</th>
+          <th>Especialidade</th>
+          <th>Registro Categoria</th>
+          <th>Ações</th>
+        </tr>
+      `;
+  
+      // Preenche a tabela com os dados dos usuários
+      let corpoTabela = '';
+      usuarios.forEach(usuario => {
+        console.log(usuario); // Verifica se o objeto usuário está correto
+        corpoTabela += `
+          <tr>
+            <td>${usuario.matricula}</td>
+            <td>${usuario.nome}</td>
+            <td>${usuario.cpf}</td>
+            <td>${usuario.setor}</td>
+            <td>${usuario.funcao}</td>
+            <td>${usuario.especialidade}</td>
+            <td>${usuario.registro_categoria}</td>
+            <td>
+              <button class="btn btn-danger" onclick="excluirUsuario(${usuario.matricula})">Excluir</button>
+            </td>
+          </tr>
+        `;
+      });
+  
+      // Adiciona a tabela com os dados
+      tabelaUsuarios.innerHTML = cabecalho + corpoTabela;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+// Chama a função carregarUsuarios ao carregar a página
+document.addEventListener('DOMContentLoaded', carregarUsuarios);
+
+// Função principal para inicializar o script
+function init() {
+  configurarEventos();
+  carregarUsuarios(); // Carrega a lista de usuários ao iniciar
+}
+
+// Chama a função init quando o DOM estiver completamente carregado
+document.addEventListener('DOMContentLoaded', init);
+
+// Configurar o evento de pesquisa
+document.getElementById('searchForm').addEventListener('submit', pesquisarUsuarios);

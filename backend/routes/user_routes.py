@@ -57,6 +57,25 @@ def pesquisar_usuario():
 
     return jsonify(resultado)
 
+@user_routes.route('/api/usuarios', methods=['GET'])
+@swag_from('get_all_users.yml')  # Se você estiver usando documentação Swagger
+def get_all_users():
+    usuarios = User.query.all()  # Busca todos os usuários no banco de dados
+    resultado = []
+    
+    for usuario in usuarios:
+        resultado.append({
+            "matricula": usuario.id,
+            "nome": usuario.nome,
+            "cpf": usuario.cpf,
+            "setor": usuario.setor,
+            "funcao": usuario.funcao,
+            "especialidade": usuario.especialidade,
+            "registro_categoria": usuario.registro_categoria
+        })
+
+    return jsonify(resultado), 200  # Retorna a lista de usuários em formato JSON
+
 @user_routes.route('/api/atualizar_usuario', methods=['PUT'])
 @swag_from('update_user.yml')
 def atualizar_usuario():
