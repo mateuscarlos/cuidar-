@@ -1,22 +1,29 @@
-# e:\cuidar+\backend\app.py
-
 from flask import Flask
 from flask_cors import CORS
-from db import db  # Importando o db do novo arquivo
+from db import db
 from routes.user_routes import user_routes
 from routes.routes_app import app_routes
+from flasgger import Swagger
 
 app = Flask(__name__, template_folder='../frontend/templates', static_folder='../frontend/static')
-CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5000"}})  # Permitir CORS para o frontend
+app.config["SWAGGER"] = {"title": "API Cuidar+", "uiversion": 3, "debug": True}
+Swagger(app)
+
+CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5000"}})
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)  # Inicializando o db com a aplicação
 
-# Registrando as rotas
+if not app.config['SQLALCHEMY_DATABASE_URI']:
+    raise RuntimeError('No database URI provided')
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
 app.register_blueprint(app_routes)
 app.register_blueprint(user_routes)
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Cria o banco de dados e as tabelas
     app.run(debug=True)

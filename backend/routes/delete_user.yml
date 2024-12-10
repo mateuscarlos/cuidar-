@@ -1,0 +1,15 @@
+summary: Deleta um usuário existente
+description: Deleta um usuário existente com o ID fornecido
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - name: user_id
+    in: path
+    description: ID do usuário
+    required: true
+    type: integer
+responses:
+  200:
+    description: Usuário deletado com sucesso
