@@ -232,11 +232,11 @@ async function pesquisarUsuarios(event) {
       return;
     }
 
-    // Create a table to display the results
+    // Cria uma tabela para exibir os resultados
     const tabela = document.createElement('table');
     tabela.className = 'table table-striped';
 
-    // Create the table header
+    // Cria o cabeçalho da tabela
     const cabecalho = tabela.createTHead();
     const linhaCabecalho = cabecalho.insertRow(0);
     linhaCabecalho.innerHTML = `
@@ -250,7 +250,7 @@ async function pesquisarUsuarios(event) {
       <th>Ações</th>
     `;
 
-    // Create the table body
+    // Cria o corpo da tabela 
     const corpoTabela = tabela.createTBody();
     usuarios.forEach((usuario) => {
       if (!usuario || !usuario.Matrícula || !usuario.Nome || !usuario.CPF ||
@@ -304,25 +304,36 @@ async function excluirUsuario(matricula) {
     }
   }
 
-  async function mostrarUsuarios() {
-    try {
-      const response = await fetch('http://localhost:5000/api/usuarios');
-      const usuarios = await response.json();
-      console.log(usuarios); // Verifica se os dados estão sendo retornados corretamente
-      console.log(usuarios.length); // Verifica se existem usuários
-      const tabelaUsuarios = document.getElementById('tabela-usuarios');
-  
-      // Limpa a tabela antes de adicionar novos usuários
-      tabelaUsuarios.innerHTML = '';
-  
-      // Verifica se existem usuários
-      if (usuarios.length === 0) {
-        tabelaUsuarios.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum usuário encontrado.</td></tr>';
-        return;
-      }
-  
-      // Cria a tabela com os cabeçalhos
-      const cabecalho = `
+// Função para exibir todos os usuários
+async function mostrarUsuarios() {
+  try {
+    const tabelaUsuarios = document.getElementById('tabela-usuarios');
+    if (!tabelaUsuarios) {
+      console.error('Elemento com ID "tabela-usuarios" não encontrado.');
+      return;
+    }
+
+    const response = await fetch('http://localhost:5000/api/usuarios');
+    if (!response.ok) {
+      console.error('Erro na API:', response.status, response.statusText);
+      return;
+    }
+
+    const usuarios = await response.json();
+    console.log('Dados recebidos da API:', usuarios);
+
+    // Limpa a tabela antes de adicionar novos usuários
+    tabelaUsuarios.innerHTML = '';
+
+    // Verifica se existem usuários
+    if (usuarios.length === 0) {
+      tabelaUsuarios.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum usuário encontrado.</td></tr>';
+      return;
+    }
+
+    // Cria os cabeçalhos da tabela
+    const cabecalho = `
+      <thead>
         <tr>
           <th>Matrícula</th>
           <th>Nome</th>
@@ -333,46 +344,54 @@ async function excluirUsuario(matricula) {
           <th>Registro Categoria</th>
           <th>Ações</th>
         </tr>
+      </thead>
+    `;
+
+    // Preenche o corpo da tabela com os dados dos usuários
+    let corpoTabela = '<tbody>';
+    usuarios.forEach(usuario => {
+      corpoTabela += `
+        <tr>
+          <td>${usuario.matricula}</td>
+          <td>${usuario.nome}</td>
+          <td>${usuario.cpf}</td>
+          <td>${usuario.setor}</td>
+          <td>${usuario.funcao}</td>
+          <td>${usuario.especialidade}</td>
+          <td>${usuario.registro_categoria}</td>
+          <td>
+            <button class="btn btn-danger" onclick="excluirUsuario(${usuario.matricula})">Excluir</button>
+          </td>
+        </tr>
       `;
-  
-      // Preenche a tabela com os dados dos usuários
-      let corpoTabela = '';
-      usuarios.forEach(usuario => {
-        console.log(usuario); // Verifica se o objeto usuário está correto
-        corpoTabela += `
-          <tr>
-            <td>${usuario.matricula}</td>
-            <td>${usuario.nome}</td>
-            <td>${usuario.cpf}</td>
-            <td>${usuario.setor}</td>
-            <td>${usuario.funcao}</td>
-            <td>${usuario.especialidade}</td>
-            <td>${usuario.registro_categoria}</td>
-            <td>
-              <button class="btn btn-danger" onclick="excluirUsuario(${usuario.matricula})">Excluir</button>
-            </td>
-          </tr>
-        `;
-      });
-  
-      // Adiciona a tabela com os dados
-      tabelaUsuarios.innerHTML = cabecalho + corpoTabela;
-    } catch (error) {
-      console.error(error);
-    }
+    });
+    corpoTabela += '</tbody>';
+
+    // Adiciona os cabeçalhos e o corpo da tabela
+    tabelaUsuarios.innerHTML = cabecalho + corpoTabela;
+  } catch (error) {
+    console.error('Erro ao exibir usuários:', error);
   }
+}
+
+
+
 
 // Chama a função carregarUsuarios ao carregar a página
-document.addEventListener('DOMContentLoaded', carregarUsuarios);
+//document.addEventListener('DOMContentLoaded', carregarUsuarios);
 
-// Função principal para inicializar o script
-function init() {
-  configurarEventos();
-  carregarUsuarios(); // Carrega a lista de usuários ao iniciar
-}
+// Chama a função carregarUsuarios ao carregar a página
+document.addEventListener('DOMContentLoaded', mostrarUsuarios);
 
 // Chama a função init quando o DOM estiver completamente carregado
 document.addEventListener('DOMContentLoaded', init);
 
 // Configurar o evento de pesquisa
 document.getElementById('searchForm').addEventListener('submit', pesquisarUsuarios);
+
+// Função principal para inicializar o script
+function init() {
+  configurarEventos();
+  //carregarUsuarios();
+  mostrarUsuarios(); 
+}

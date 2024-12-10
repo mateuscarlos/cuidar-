@@ -25,38 +25,6 @@ def create_user():
     db.session.commit()
     return jsonify({'message': 'Usuário criado com sucesso!'}), 201
 
-@user_routes.route('/api/consultar_usuario', methods=['GET'])
-@swag_from('get_user.yml')
-def pesquisar_usuario():
-    campo = request.args.get('campo')
-    valor = request.args.get('valor')
-
-    if campo not in ['id', 'nome', 'cpf', 'setor', 'matricula', 'registro_categoria']:
-        return jsonify({"message": "Campo de pesquisa inválido."}), 400
-
-    # Realiza a consulta no banco de dados
-    if campo == 'matricula':
-        usuarios = User.query.filter_by(id=valor).all()
-    elif campo == 'registro_categoria':
-        usuarios = User.query.filter(User.registro_categoria.like(f'%{valor}%')).all()
-    else:
-        usuarios = User.query.filter(getattr(User, campo).like(f'%{valor}%')).all()
-    
-    # Converte os resultados em um formato JSON
-    resultado = []
-    for usuario in usuarios:
-        resultado.append({
-            "Matrícula": usuario.id,
-            "Nome": usuario.nome,
-            "CPF": usuario.cpf,
-            "Setor": usuario.setor,
-            "Função": usuario.funcao,
-            "Especialidade": usuario.especialidade,
-            "Registro Categoria": usuario.registro_categoria
-        })
-
-    return jsonify(resultado)
-
 @user_routes.route('/api/usuarios', methods=['GET'])
 @swag_from('get_all_users.yml')  # Se você estiver usando documentação Swagger
 def get_all_users():
