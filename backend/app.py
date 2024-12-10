@@ -1,3 +1,4 @@
+#Inicialização da aplicação
 from flask import Flask
 from flask_cors import CORS
 from db import db
@@ -11,6 +12,7 @@ Swagger(app)
 
 CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5000"}})
 
+# Configuração SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -22,6 +24,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+# Registro de rotas
 app.register_blueprint(app_routes)
 app.register_blueprint(user_routes)
 

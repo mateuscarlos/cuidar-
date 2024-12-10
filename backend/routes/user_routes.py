@@ -1,16 +1,17 @@
 from flask import Blueprint, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from models.user import User
-from db import db  # Importando o db do novo arquivo
+from db import db  
 from flasgger import swag_from
 
 user_routes = Blueprint('user_routes', __name__)
 
 usuarios = []
 
+#Criar novo usuário
 @user_routes.route('/api/users', methods=['POST'])
 @swag_from('create_user.yml')
 def create_user():
+
     data = request.json
     new_user = User(
         nome=data['nome'],
@@ -25,10 +26,12 @@ def create_user():
     db.session.commit()
     return jsonify({'message': 'Usuário criado com sucesso!'}), 201
 
+#Lista todos os usuários
 @user_routes.route('/api/usuarios', methods=['GET'])
-@swag_from('get_all_users.yml')  # Se você estiver usando documentação Swagger
+@swag_from('get_all_users.yml') 
 def get_all_users():
-    usuarios = User.query.all()  # Busca todos os usuários no banco de dados
+
+    usuarios = User.query.all()  
     resultado = []
     
     for usuario in usuarios:
@@ -42,11 +45,17 @@ def get_all_users():
             "registro_categoria": usuario.registro_categoria
         })
 
-    return jsonify(resultado), 200  # Retorna a lista de usuários em formato JSON
+    return jsonify(resultado), 200  
+
+
+#Atualizar um usuário
 
 @user_routes.route('/api/atualizar_usuario', methods=['PUT'])
 @swag_from('update_user.yml')
 def atualizar_usuario():
+    """
+    Update a user
+    """
     matricula = request.json['matricula']
     nome = request.json['nome']
     cpf = request.json['cpf']
@@ -69,9 +78,12 @@ def atualizar_usuario():
         return jsonify({'message': 'Usuário não encontrado!'}), 404
 
 
+#Excluir um usuário
+
 @user_routes.route('/api/excluir_usuario', methods=['DELETE'])
 @swag_from('delete_user.yml')
 def excluir_usuario():
+
     matricula = request.args.get('matricula')
 
     if not matricula:

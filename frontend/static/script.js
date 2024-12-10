@@ -55,34 +55,9 @@ const funcoesPorSetor = {
       "Coordenador Financeiro",
     ],
   };
-/*
-// Função para carregar a lista de usuários
-async function carregarUsuarios() {
-    try {
-        const response = await fetch('http://localhost:5000/api/users');
-        const usuarios = await response.json();
-        const listaUsuarios = document.getElementById('usuarios-lista');
-
-        if (usuarios.length === 0) {
-            listaUsuarios.innerHTML = '<p>Nenhum usuário encontrado.</p>';
-            return;
-        }
-
-        listaUsuarios.innerHTML = ''; // Limpa a lista antes de adicionar novos usuários
-        usuarios.forEach(usuario => {
-            const usuarioDiv = document.createElement('div');
-            usuarioDiv.className = 'usuario-item';
-            usuarioDiv.innerHTML = `<p>${usuario.nome} - ${usuario.funcao}</p>`;
-            listaUsuarios.appendChild(usuarioDiv);
-        });
-    } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-    }
-}
-*/
 // Função para cadastrar um novo usuário
 async function cadastrarUsuario(event) {
-    event.preventDefault(); // Impede o envio padrão do formulário
+    event.preventDefault(); 
 
     // Coleta os dados do formulário
     const formData = {
